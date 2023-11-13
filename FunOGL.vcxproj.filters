@@ -30,6 +30,9 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Shader.hpp">
@@ -38,12 +41,15 @@
     <ClInclude Include="stb_image.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\shader.frag">
+    <None Include="shaders\basic.frag">
       <Filter>Resource Files\shaders</Filter>
     </None>
-    <None Include="shaders\shader.vert">
+    <None Include="shaders\basic.vert">
       <Filter>Resource Files\shaders</Filter>
     </None>
   </ItemGroup>
