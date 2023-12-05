@@ -151,10 +151,12 @@ int main()
     basicShader.setVec4("lightColor", lightColor);
     basicShader.setVec3("lightPos", lightPos);
 
-    Texture texture0("textures/tex1.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
-    texture0.texUnit(basicShader, "tex0", 0);
+    Texture texture0_diffuse("textures/container2.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    Texture texture0_specular("textures/container2_specular.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    texture0_diffuse.texUnit(basicShader, "tex0_diffuse", 0);
+    texture0_specular.texUnit(basicShader, "tex0_specular", 1);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 
     Camera camera(SCR_HEIGHT, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 2.0f));
@@ -168,7 +170,7 @@ int main()
         basicShader.use();
         basicShader.setVec3("camPos", camera.Position);
         camera.Matrix(basicShader, "camMatrix");
-        texture0.Bind();
+        texture0_diffuse.Bind();
         VAO1.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 
@@ -186,7 +188,7 @@ int main()
     VAO1.Delete();
     VBO1.Delete();
     EBO1.Delete();
-    texture0.Delete();
+    texture0_diffuse.Delete();
     basicShader.Delete();
     lightVAO.Delete();
     lightVBO.Delete();
