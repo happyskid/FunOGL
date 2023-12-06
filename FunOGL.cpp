@@ -176,6 +176,8 @@ int main()
         camera.updateMatrix(45.0f, 0.1f, 100.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        pyramidModel = glm::rotate(pyramidModel, glm::radians((float)glfwGetTime() / 100), glm::vec3(1.0f, 1.0f, 1.0f));
+
         basicShader.use();
         basicShader.setMat4("model", pyramidModel);
         basicShader.setVec3("camPos", camera.Position);
