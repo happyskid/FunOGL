@@ -19,6 +19,7 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
+    // Setup glfw window
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -157,6 +158,7 @@ int main()
     texture0_specular.texUnit(basicShader, "tex0_specular", 1);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
 
     Camera camera(SCR_HEIGHT, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 2.0f));
@@ -167,6 +169,7 @@ int main()
         camera.updateMatrix(45.0f, 0.1f, 100.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Draw basic pyramid
         basicShader.use();
         basicShader.setVec3("camPos", camera.Position);
         camera.Matrix(basicShader, "camMatrix");
@@ -174,12 +177,13 @@ int main()
         VAO1.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 
+        // Draw basic light cube
         lightShader.use();
         camera.Matrix(lightShader, "camMatrix");
         lightVAO.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
 
-
+        // Apply buffer and poll for events
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
@@ -198,6 +202,7 @@ int main()
     return 0;
 }
 
+// Resize framebuffer on window resize
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
