@@ -19,6 +19,7 @@ const unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
+    // Setup glfw window
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -27,16 +28,20 @@ int main()
     // glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 
     GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "FunOGL", NULL, NULL);
+    
+    // Failed
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return 1;
     }
+
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+    // Init glad
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
@@ -48,6 +53,7 @@ int main()
     Shader basicShader("shaders/basic.vert", "shaders/basic.frag");
     Shader lightShader("shaders/light.vert", "shaders/light.frag");
 
+    // Objects
     GLfloat vertices[] =
     { //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
         -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f, 	 0.0f, 0.0f,      0.0f, -1.0f, 0.0f, // Bottom side
@@ -151,11 +157,13 @@ int main()
     basicShader.setVec4("lightColor", lightColor);
     basicShader.setVec3("lightPos", lightPos);
 
-    Texture texture0_diffuse("textures/container2.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    Texture texture0_specular("textures/container2_specular.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    // Load textures
+    Texture texture0_diffuse("textures/tex1.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+    Texture texture0_specular("textures/container2_specular.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
     texture0_diffuse.texUnit(basicShader, "tex0_diffuse", 0);
     texture0_specular.texUnit(basicShader, "tex0_specular", 1);
 
+    // Setup buffers
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
 
@@ -167,18 +175,23 @@ int main()
         camera.updateMatrix(45.0f, 0.1f, 100.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // Rotate pyramid
+        pyramidModel = glm::rotate(pyramidModel, glm::radians((float)glfwGetTime()/100), glm::vec3(1.0f, 1.0f, 1.0f));
+
+        // Draw basic pyramid
         basicShader.use();
+        basicShader.setMat4("model", pyramidModel);
         basicShader.setVec3("camPos", camera.Position);
         camera.Matrix(basicShader, "camMatrix");
         texture0_diffuse.Bind();
         VAO1.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 
+        // Draw basic light cube
         lightShader.use();
         camera.Matrix(lightShader, "camMatrix");
         lightVAO.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
-
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -198,6 +211,7 @@ int main()
     return 0;
 }
 
+// Resize frame buffer to fit window
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);

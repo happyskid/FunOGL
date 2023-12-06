@@ -28,8 +28,8 @@ void main()
 	vec3 reflectionDirection = reflect(-lightDirection, normal);
 	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 8);
 	float specular = specAmount * specularLight;
-	vec4 specMap = specular * texture(tex0_specular, texCoord);
 
 	// outputs final color
-	FragColor = texture(tex0_diffuse, texCoord) * lightColor * (diffuse + ambient + specMap);
+	FragColor = texture(tex0_diffuse, texCoord) * lightColor * (ambient + diffuse + specular);
+	FragColor.a = 1.0f;
 }
