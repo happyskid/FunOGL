@@ -165,6 +165,7 @@ int main()
 
     // Setup buffers
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    // Enable depth buffer
     glEnable(GL_DEPTH_TEST);
 
     Camera camera(SCR_HEIGHT, SCR_HEIGHT, glm::vec3(0.0f, 0.0f, 2.0f));
@@ -175,10 +176,6 @@ int main()
         camera.updateMatrix(45.0f, 0.1f, 100.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        // Rotate pyramid
-        pyramidModel = glm::rotate(pyramidModel, glm::radians((float)glfwGetTime()/100), glm::vec3(1.0f, 1.0f, 1.0f));
-
-        // Draw basic pyramid
         basicShader.use();
         basicShader.setMat4("model", pyramidModel);
         basicShader.setVec3("camPos", camera.Position);
@@ -192,6 +189,7 @@ int main()
         camera.Matrix(lightShader, "camMatrix");
         lightVAO.Bind();
         glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -211,7 +209,6 @@ int main()
     return 0;
 }
 
-// Resize frame buffer to fit window
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
