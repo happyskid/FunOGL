@@ -18,5 +18,5 @@ void main()
 	gl_Position = camMatrix * vec4(crntPos, 1.0f);
 	texCoord = aTex;
 	color = aColor;
-	Normal = aNormal;
+	Normal = mat3(transpose(inverse(model))) * aNormal;
 }
