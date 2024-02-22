@@ -1,5 +1,7 @@
 #version 330 core
+
 out vec4 FragColor;
+
 
 in vec3 color;
 in vec2 texCoord;
@@ -7,14 +9,69 @@ in vec3 Normal;
 in vec3 crntPos;
 
 uniform sampler2D texture_diffuse1;
+uniform sampler2D texture_specular1;
+uniform samplerCube skybox;
 uniform vec4 lightColor;
 uniform vec3 lightPos;
 uniform vec3 camPos;
 
-void main()
+vec4 pointLight()
+{	
+	// used in two variables so I calculate it here to not have to do it twice
+	vec3 lightVec = lightPos - crntPos;
+
+	// intensity of light with respect to distance
+	float dist = length(lightVec);
+	float a = 1.0;
+	float b = 0.7;
+	float inten = 1.0f / (a * dist * dist + b * dist + 1.0f);
+
+	// ambient lighting
+	float ambient = 0.20f;
+
+	// diffuse lighting
+	vec3 normal = normalize(Normal);
+	vec3 lightDirection = normalize(lightVec);
+	float diffuse = max(dot(normal, lightDirection), 0.0f);
+
+	// specular lighting
+	float specularLight = 0.50f;
+	vec3 viewDirection = normalize(camPos - crntPos);
+	vec3 reflectionDirection = reflect(-lightDirection, normal);
+	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
+	float specular = specAmount * specularLight;
+
+	return (texture(texture_diffuse1, texCoord) * (diffuse * inten + ambient) + texture(texture_specular1, texCoord).r * specular * inten) * lightColor;
+}
+
+vec4 direcLight()
 {
 	// ambient lighting
-	float ambient = 0.40f;
+	float ambient = 0.20f;
+
+	// diffuse lighting
+	vec3 normal = normalize(Normal);
+	vec3 lightDirection = normalize(vec3(1.0f, 1.0f, 0.0f));
+	float diffuse = max(dot(normal, lightDirection), 0.0f);
+
+	// specular lighting
+	float specularLight = 0.50f;
+	vec3 viewDirection = normalize(camPos - crntPos);
+	vec3 reflectionDirection = reflect(-lightDirection, normal);
+	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
+	float specular = specAmount * specularLight;
+
+	return (texture(texture_diffuse1, texCoord) * (diffuse + ambient) + texture(texture_specular1, texCoord).r * specular) * lightColor;
+}
+
+vec4 spotLight()
+{
+	// controls how big the area that is lit up is
+	float outerCone = 0.90f;
+	float innerCone = 0.95f;
+
+	// ambient lighting
+	float ambient = 0.20f;
 
 	// diffuse lighting
 	vec3 normal = normalize(Normal);
@@ -28,10 +85,18 @@ void main()
 	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
 	float specular = specAmount * specularLight;
 
-	// attenuation factors
-    float distance = length(lightPos - crntPos);
-    float attenuation = 1.0 / (1.0 + 0.1 * distance + 0.01 * distance * distance);
-	
-	// outputs final color
-	FragColor = (texture(texture_diffuse1, texCoord) * (diffuse + ambient + specular)) * lightColor * attenuation;
+	// calculates the intensity of the crntPos based on its angle to the center of the light cone
+	float angle = dot(vec3(0.0f, -1.0f, 0.0f), -lightDirection);
+	float inten = clamp((angle - outerCone) / (innerCone - outerCone), 0.0f, 1.0f);
+
+	return (texture(texture_diffuse1, texCoord) * (diffuse * inten + ambient) + texture(texture_specular1, texCoord).r * specular * inten) * lightColor;
+}
+
+
+void main()
+{
+	float ratio = 1.00 / 1.52;
+    vec3 I = normalize(crntPos - camPos);
+    vec3 R = refract(I, normalize(Normal), ratio);
+	FragColor = vec4(texture(skybox, R).rgb, 1);
 }
